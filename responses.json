@@ -1,0 +1,23 @@
+{
+  "greetings": [
+    "Halo! Senang bisa ngobrol sama kamu 😊",
+    "Hai, apa kabar? 😄",
+    "Halo! Gimana harimu?",
+    "Haii! Ada yang bisa aku bantu?"
+  ],
+  "jam_responses": [
+    "Sekarang jam {}",
+    "Jamnya sekarang {}",
+    "Waktunya menunjukkan pukul {}"
+  ],
+  "tanggal_responses": [
+    "Hari ini tanggal {}",
+    "Sekarang tanggal {}",
+    "Tanggal hari ini adalah {}"
+  ],
+  "bye_responses": [
+    "Dadah! Sampai jumpa lagi 👋",
+    "Selamat tinggal! Semoga harimu menyenangkan 😊",
+    "Bye-bye! Jangan lupa balik ngobrol lagi 😄"
+  ]
+}

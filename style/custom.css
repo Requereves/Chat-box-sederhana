@@ -1,0 +1,21 @@
+/* style/custom.css */
+.stApp {
+    background-color: #f0f2f6;
+}
+
+h1 {
+    color: #0078D7;
+    text-align: center;
+}
+
+.stChatMessage.user {
+    background-color: #DCF8C6;
+    border-radius: 10px;
+    padding: 8px;
+}
+
+.stChatMessage.assistant {
+    background-color: #E8E8E8;
+    border-radius: 10px;
+    padding: 8px;
+}
