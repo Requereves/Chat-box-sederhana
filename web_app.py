@@ -1,86 +1,57 @@
 import streamlit as st
 import pandas as pd
-from chatbot import chatbot_response
-from db_mysql import save_chat, create_table, get_chat_history, get_connection
+import json
+# from chatbot import chatbot_response
+from db_mysql import create_table
+from admin_panel import show_admin_panel
+from chatbot import chatbot_page
 
 
-# def load_css(file_name):
-#     with open(file_name) as f:
-#         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+st.set_page_config(page_title="Chatbot App", page_icon="💬", layout="wide")
 
-# load_css("style/custom.css")
+# === Load user admin ===
+with open("users.json", "r", encoding="utf-8") as f:
+    USERS = json.load(f)
 
-# === Konfigurasi Halaman ===
-st.set_page_config(page_title="Chatbot Sederhana 🤖", page_icon="💬", layout="centered")
+# === Session State untuk login admin ===
+if "admin_logged_in" not in st.session_state:
+    st.session_state.admin_logged_in = False
 
 # === Sidebar Navigasi ===
-st.sidebar.title("🧭 Navigasi")
-page = st.sidebar.radio("Pilih Halaman:", ["💬 Chatbot", "🧠 Admin Panel"])
+st.sidebar.title("📂 Navigasi")
+page = st.sidebar.radio("Pilih Halaman:", ["Chatbot", "Admin Panel"])
 
-create_table()  # pastikan tabel ada
+st.sidebar.markdown("---")
 
-# === Halaman Chatbot ===
-if page == "💬 Chatbot":
-    st.title("💬 Chatbot Sederhana ")
-
+# === Halaman Chatbot  ===
+if page == "Chatbot":
+    st.subheader("💬 Halaman Chatbot")
     username = st.text_input("Masukkan username kamu:")
 
     if username:
-        st.write(f"Halo **{username}**, silakan mulai chat!")
-
-        if "messages" not in st.session_state:
-            st.session_state.messages = []
-
-        for msg in st.session_state.messages:
-            st.chat_message(msg["role"]).write(msg["content"])
-
-        if prompt := st.chat_input("Ketik pesan kamu..."):
-            st.chat_message("user").write(prompt)
-            response = chatbot_response(username, prompt)
-            st.chat_message("assistant").write(response)
-
-            save_chat(username, prompt, response)
-            st.session_state.messages.append({"role": "user", "content": prompt})
-            st.session_state.messages.append({"role": "assistant", "content": response})
+        chatbot_page(username=username)
     else:
         st.info("Masukkan username dulu untuk mulai chat.")
 
-# === Halaman Admin Panel ===
-elif page == "🧠 Admin Panel":
-    st.title("🧠 Admin Panel - Riwayat Chat")
+# === Halaman Admin (perlu login) ===
+elif page == "Admin Panel":
+    if not st.session_state.admin_logged_in:
+        st.subheader("🔐 Login Admin")
 
-    # === Login sederhana ===
-    password = st.text_input("Masukkan password admin:", type="password")
-    if password != "admin123":  # ganti dengan password rahasia kamu
-        st.warning("Masukkan password untuk mengakses panel admin.")
-        st.stop()
+        username = st.text_input("Username")
+        password = st.text_input("Password", type="password")
 
-    # === Jika password benar, tampilkan panel ===
-    st.success("Login berhasil ✅")
-
-    with st.expander("🔍 Filter Chat"):
-        username_filter = st.text_input("Cari berdasarkan username (kosongkan untuk semua):")
-
-    connection = get_connection()
-    query = "SELECT * FROM chat_history"
-    params = ()
-
-    if username_filter:
-        query += " WHERE username = %s"
-        params = (username_filter,)
-
-    query += " ORDER BY timestamp DESC"
-
-    df = pd.read_sql(query, connection, params=params)
-    connection.close()
-
-    if df.empty:
-        st.warning("Belum ada chat tersimpan di database.")
+        if st.button("Login"):
+            if username in USERS and USERS[username]["password"] == password and USERS[username]["role"] == "admin":
+                st.session_state.admin_logged_in = True
+                st.success("Login berhasil! 👑")
+                st.rerun()
+            else:
+                st.error("Username atau password salah.")
     else:
-        st.dataframe(df, use_container_width=True)
-        st.download_button(
-            "📥 Unduh Chat sebagai CSV",
-            data=df.to_csv(index=False),
-            file_name="chat_history.csv",
-            mime="text/csv",
-        )
+        st.sidebar.success("✅ Admin login aktif")
+        if st.sidebar.button("🚪 Logout"):
+            st.session_state.admin_logged_in = False
+            st.rerun()
+
+        show_admin_panel()

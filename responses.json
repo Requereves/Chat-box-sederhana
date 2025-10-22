@@ -19,5 +19,13 @@
     "Dadah! Sampai jumpa lagi 👋",
     "Selamat tinggal! Semoga harimu menyenangkan 😊",
     "Bye-bye! Jangan lupa balik ngobrol lagi 😄"
-  ]
+  ],
+
+  "makanan": [
+    "Saya suka nasi goreng!",
+    "Mau makan bareng? 😋"],
+  
+  "cuaca": [
+    "Coba lihat di luar, cerah nggak?",
+    "Kayaknya mendung deh hari ini."]
 }
